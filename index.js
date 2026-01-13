@@ -1,20 +1,15 @@
-/**
- * KONFIGURASI & STATE
- */
+// URL Google Sheet yang sudah di-publish sebagai CSV (Tab RUMUS)
 const sheetUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR_LsggdPOwSms8SO0wuSEiMAIdyMjYlt0G9z71aZa2gy0ngATMJiakSa_a7cygOFa1WhCinsfHk3AQ/pub?gid=1252451747&single=true&output=csv";
-let networkData = [];
 
-/**
- * FUNGSI UTILITAS (LOGGING)
- */
+let data = [];
+
+// Fungsi untuk mencatat log ke konsol browser (F12)
 function logStatus(message, isError = false) {
     console.log(isError ? "❌ ERROR: " : "ℹ️ LOG: ", message);
 }
 
-/**
- * 1. LOGIKA INVENTORY & SEARCH (Google Sheets)
- */
-function initInventory() {
+// Fungsi inisialisasi untuk ambil data dari Google Sheets
+function init() {
     logStatus("Memulai pengambilan data dari Google Sheets...");
     
     Papa.parse(sheetUrl, {
@@ -22,21 +17,25 @@ function initInventory() {
         header: true,
         skipEmptyLines: true,
         complete: function (results) {
-            networkData = results.data;
-            if (networkData.length > 0) {
-                logStatus("Data Berhasil Dimuat! Jumlah baris: " + networkData.length);
-                logStatus("Kolom terdeteksi: " + Object.keys(networkData[0]).join(", "));
+            data = results.data;
+            if (data.length > 0) {
+                logStatus("Data Berhasil Dimuat! Jumlah baris: " + data.length);
+                // Menampilkan nama kolom asli dari Sheet untuk memastikan case-sensitive
+                logStatus("Kolom yang terdeteksi: " + Object.keys(data[0]).join(", "));
             } else {
                 logStatus("Data kosong atau format salah.", true);
             }
         },
         error: function(error) {
             logStatus("Gagal memproses CSV: " + error.message, true);
+            alert("Gagal memuat data. Pastikan Google Sheet sudah di-publish ke Web sebagai CSV.");
         }
     });
 }
 
-const handleSearch = () => {
+// Event Listener untuk tombol cari
+document.getElementById("search-btn").addEventListener("click", () => {
+    // Ambil nilai input
     const inputIP = document.getElementById("ip").value.trim();
     const inputSlot = document.getElementById("slot").value.trim();
     const inputPort = document.getElementById("port").value.trim();
@@ -46,7 +45,10 @@ const handleSearch = () => {
         return;
     }
 
-    const filtered = networkData.filter((item) => {
+    // Filter data berdasarkan input
+    const filteredData = data.filter((item) => {
+        // PERBAIKAN: Pastikan nama properti (IP, SLOT, PORT) sesuai dengan header di Google Sheet
+        // Gunakan trim() pada data sheet juga untuk menghindari spasi tak terlihat
         return (
             String(item.IP || "").trim() === inputIP && 
             String(item.SLOT || "").trim() === inputSlot && 
@@ -54,10 +56,10 @@ const handleSearch = () => {
         );
     });
 
-    renderInventoryTable(filtered);
-};
+    renderTable(filteredData);
+});
 
-const renderInventoryTable = (filteredData) => {
+const renderTable = (filteredData) => {
     const tbody = document.getElementById("result-body");
     const emptyMsg = document.getElementById("empty-msg");
 
@@ -72,29 +74,72 @@ const renderInventoryTable = (filteredData) => {
     filteredData.forEach((item) => {
         const row = document.createElement("tr");
         row.innerHTML = `
-            <td data-label="IP">${item.IP || '-'}</td>
-            <td data-label="SLOT">${item.SLOT || '-'}</td>
-            <td data-label="PORT">${item.PORT || '-'}</td>
-            <td data-label="VLAN">${item.VLAN || '-'}</td>
-            <td data-label="ID_PORT">${item.ID_PORT || '-'}</td>
-            <td data-label="GPON">${item.GPON || '-'}</td>
-            <td data-label="VENDOR">${item.VENDOR || '-'}</td>
+            <td>${item.IP || '-'}</td>
+            <td>${item.SLOT || '-'}</td>
+            <td>${item.PORT || '-'}</td>
+            <td>${item.VLAN || '-'}</td>
+            <td>${item.ID_PORT || '-'}</td>
+            <td>${item.GPON || '-'}</td>
+            <td>${item.VENDOR || '-'}</td>
         `;
         tbody.appendChild(row);
     });
 };
 
-/**
- * 2. LOGIKA ALTER PROVISIONING (Table & CSV)
- */
+
+//-- Fungsi untuk Mengambil Service dari BIMA
+
+document.getElementById('btnExtract').addEventListener('click', function() {
+    const input = document.getElementById('inputText').value;
+    const outputList = document.getElementById('outputList');
+    const resultArea = document.getElementById('resultArea');
+
+    const keyword = "Service ID is ";
+    let targetText = input.includes(keyword) ? input.split(keyword)[1] : input;
+    const services = targetText.trim().split(',');
+
+    outputList.innerHTML = ""; 
+
+    if (services.length > 0 && services[0] !== "") {
+        resultArea.classList.remove('hidden');
+        services.forEach(item => {
+            const cleanItem = item.trim();
+            if (cleanItem !== "") {
+                const div = document.createElement('div');
+                div.className = 'service-card';
+                div.innerHTML = `
+                    <span>${cleanItem}</span>
+                    <button class="copy-btn" onclick="copyText('${cleanItem}')" title="Salin">
+                        <i data-lucide="copy" style="width:16px; height:16px"></i>
+                    </button>
+                `;
+                outputList.appendChild(div);
+            }
+        });
+        lucide.createIcons(); // Re-render icon lucide
+    } else {
+        alert("Mohon masukkan data yang valid.");
+    }
+});
+
+// Fungsi Global untuk Copy
+window.copyText = function(text) {
+    navigator.clipboard.writeText(text).then(() => {
+        alert("Berhasil disalin: " + text);
+    });
+};
+
+// --- Fungsi untuk Bagian Alter Prov ---
+// (Fungsi addRow, removeRow, downloadCSV tetap sama namun pastikan ID elemen ada di HTML)
+
 window.addRow = function() {
     const tableBody = document.querySelector("#dataTable tbody");
     const newRow = document.createElement("tr");
     newRow.innerHTML = `
-        <td data-label="RESOURCE_ID"><input type="text" class="res-id" placeholder="ID"></td>
-        <td data-label="SERVICE_NAME"><input type="text" class="ser-name" placeholder="Service"></td>
-        <td data-label="TARGET_ID"><input type="text" class="tar-id" placeholder="Target"></td>
-        <td data-label="CONFIG_ITEM">
+        <td><input type="text" class="res-id" placeholder="ID"></td>
+        <td><input type="text" class="ser-name" placeholder="Service"></td>
+        <td><input type="text" class="tar-id" placeholder="Target"></td>
+        <td>
             <select class="cfg-name">
                 <option value="Service_Port">Service_Port</option>
                 <option value="S-Vlan">S-Vlan</option>
@@ -119,11 +164,10 @@ window.removeRow = function(btn) {
 window.downloadCSV = function() {
     const rows = document.querySelectorAll("#dataTable tr");
     let csvContent = "";
-    
     rows.forEach((row, rowIndex) => {
         let rowData = [];
         const cols = row.querySelectorAll("th, td");
-        
+        // Loop kolom kecuali kolom terakhir (tombol hapus)
         for (let i = 0; i < cols.length - 1; i++) {
             let cellValue = "";
             if (rowIndex === 0) {
@@ -140,52 +184,10 @@ window.downloadCSV = function() {
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
-    link.href = url;
-    link.download = `Alter_Provisioning_${new Date().getTime()}.csv`;
+    link.setAttribute("href", url);
+    link.setAttribute("download", `Alter Service Config Item.csv`);
     link.click();
 };
 
-/**
- * 3. LOGIKA SERVICE ID EXTRACTOR
- */
-const handleExtract = () => {
-    const input = document.getElementById('inputText').value;
-    const outputList = document.getElementById('outputList');
-    const resultArea = document.getElementById('resultArea');
-
-    const keyword = "Service ID is ";
-    let targetText = input.includes(keyword) ? input.split(keyword)[1] : input;
-
-    const services = targetText.trim().split(',');
-    outputList.innerHTML = ""; 
-
-    const validServices = services.filter(item => item.trim() !== "");
-
-    if (validServices.length > 0) {
-        resultArea.classList.remove('hidden');
-        validServices.forEach(item => {
-            const div = document.createElement('div');
-            div.className = 'service-card';
-            div.textContent = item.trim();
-            outputList.appendChild(div);
-        });
-    } else {
-        alert("Mohon masukkan data yang valid.");
-    }
-};
-
-/**
- * INISIALISASI EVENT LISTENERS
- */
-document.addEventListener("DOMContentLoaded", () => {
-    // Inisialisasi Data Sheet
-    initInventory();
-
-    // Event Listener Tombol Cari (Inventory)
-    const searchBtn = document.getElementById("search-btn");
-    if (searchBtn) searchBtn.addEventListener("click", handleSearch);
-
-    // Event Listener Tombol Ekstrak (Service ID)
-    const extractBtn = document.getElementById("btnExtract");
-    if (extractBtn) extractBtn.addEventListener("click", handleExtract);
-});
+// Jalankan fungsi init saat halaman dimuat
+init();
