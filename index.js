@@ -189,5 +189,37 @@ window.downloadCSV = function() {
     link.click();
 };
 
+// --- Fitur Dark Mode ---
+const themeToggle = document.getElementById('theme-toggle');
+const themeIcon = document.getElementById('theme-icon');
+const body = document.body;
+
+// Cek simpanan tema di browser
+const currentTheme = localStorage.getItem('theme') || 'light';
+if (currentTheme === 'dark') {
+    body.setAttribute('data-theme', 'dark');
+    updateIcon(true);
+}
+
+themeToggle.addEventListener('click', () => {
+    const isDark = body.getAttribute('data-theme') === 'dark';
+    if (isDark) {
+        body.removeAttribute('data-theme');
+        localStorage.setItem('theme', 'light');
+        updateIcon(false);
+    } else {
+        body.setAttribute('data-theme', 'dark');
+        localStorage.setItem('theme', 'dark');
+        updateIcon(true);
+    }
+});
+
+function updateIcon(isDark) {
+    // Ubah icon Lucide secara dinamis
+    const iconName = isDark ? 'sun' : 'moon';
+    themeIcon.setAttribute('data-lucide', iconName);
+    lucide.createIcons(); 
+}
+
 // Jalankan fungsi init saat halaman dimuat
 init();

@@ -11,129 +11,113 @@
 <body>
 
     <header class="top-nav">
-        <div class="nav-content">
-            <h1><i data-lucide="layers"></i> NetOps <span>Pro</span></h1>
-            <p>Network Inventory & Provisioning Tools</p>
-        </div>
+<div class="nav-content">
+    <h1><i data-lucide="layers"></i> NetOps <span>Pro</span></h1>
+    <div style="display: flex; align-items: center; gap: 15px;">
+        <button id="theme-toggle" class="btn-theme" title="Ubah Tema">
+            <i data-lucide="moon" id="theme-icon"></i>
+        </button>
+        <div class="status-badge">System Active</div>
+    </div>
+</div>
     </header>
 
-    <div class="main-wrapper">
-        <section class="card animate-up">
-            <div class="card-header">
-                <div class="icon-box blue"><i data-lucide="search"></i></div>
-                <div>
-                    <h2>Search ID PORT & VLAN</h2>
-                    <p>Temukan detail teknis berdasarkan parameter perangkat</p>
+<div class="main-wrapper">
+        <div class="side-panel">
+            <section class="card animate-up">
+                <div class="card-header-sm">
+                    <i data-lucide="search" class="text-primary"></i>
+                    <h2>Inventory Search</h2>
                 </div>
-            </div>
-            <div class="input-grid">
-                <div class="input-group">
-                    <label>IP Address</label>
-                    <input id="ip" type="text" placeholder="Contoh: 10.x.x.x" />
+                <div class="search-controls">
+                    <input id="ip" type="text" placeholder="IP Address" />
+                    <input id="slot" type="text" placeholder="Slot" />
+                    <input id="port" type="text" placeholder="Port" />
+                    <button id="search-btn" class="btn-primary-sm">Cari</button>
                 </div>
-                <div class="input-group">
-                    <label>Slot</label>
-                    <input id="slot" type="text" placeholder="0" />
+                
+                <div class="table-container mini-table">
+                    <table id="result">
+                        <thead>
+                            <tr>
+                                <th>IP</th>
+                                <th>SLOT</th>
+                                <th>PORT</th>
+                                <th>VLAN</th>
+                                <th>ID PORT</th>
+                                <th>GPON</th>
+                            </tr>
+                        </thead>
+                        <tbody id="result-body"></tbody>
+                    </table>
                 </div>
-                <div class="input-group">
-                    <label>Port</label>
-                    <input id="port" type="text" placeholder="0" />
-                </div>
-                <div class="action-group">
-                    <button id="search-btn" class="btn-primary">
-                        <i data-lucide="search-code"></i> Cari Data
-                    </button>
-                </div>
-            </div>
-            
-            <div class="table-container">
-                <table id="result">
-                    <thead>
-                        <tr>
-                            <th>IP ADDRESS</th>
-                            <th>SLOT</th>
-                            <th>PORT</th>
-                            <th>VLAN</th>
-                            <th>ID PORT</th>
-                            <th>GPON</th>
-                            <th>VENDOR</th>
-                        </tr>
-                    </thead>
-                    <tbody id="result-body"></tbody>
-                </table>
-            </div>
-        </section>      
-        
-        <section class="card animate-up" style="animation-delay: 0.1s;">
-            <div class="card-header">
-                <div class="icon-box green"><i data-lucide="terminal"></i></div>
-                <div>
-                    <h2>Service ID Extractor</h2>
-                    <p>Ekstraksi log BIMA menjadi format mandiri yang bisa disalin</p>
-                </div>
-            </div>
-            
-            <div class="extractor-layout">
-                <div class="input-area">
-                    <textarea id="inputText" placeholder="Tempel teks Log dari BIMA di sini..."></textarea>
-                    <button id="btnExtract" class="btn-secondary">Ekstrak Sekarang</button>
-                </div>
+            </section>
 
+            <section class="card animate-up" style="animation-delay: 0.1s;">
+                <div class="card-header-sm">
+                    <i data-lucide="terminal" class="text-green"></i>
+                    <h2>Service Extractor</h2>
+                </div>
+                <div class="extractor-mini">
+                    <textarea id="inputText" placeholder="Paste Log BIMA..."></textarea>
+                    <button id="btnExtract" class="btn-secondary-sm">Extract</button>
+                </div>
                 <div id="resultArea" class="result-area hidden">
-                    <h3><i data-lucide="check-circle"></i> Hasil Ekstraksi:</h3>
-                    <div id="outputList" class="grid-output"></div>
+                    <div id="outputList" class="compact-output"></div>
                 </div>
-            </div>
-        </section>
+            </section>
+        </div>
 
-        <section class="card animate-up" style="animation-delay: 0.2s;">
-            <div class="card-header">
-                <div class="icon-box purple"><i data-lucide="settings-2"></i></div>
-                <div>
+        <div class="main-panel">
+            <section class="card animate-up" style="animation-delay: 0.2s;">
+                <div class="card-header-sm">
+                    <i data-lucide="settings-2" class="text-purple"></i>
                     <h2>Alter Provisioning</h2>
-                    <p>Kelola dan ekspor konfigurasi massal ke CSV</p>
                 </div>
-            </div>
-            
-            <div class="table-container">
-                <table id="dataTable" class="input-table">
-                    <thead>
-                        <tr>
-                            <th>RESOURCE ID</th>
-                            <th>SERVICE NAME</th>
-                            <th>TARGET ID</th>
-                            <th>CONFIG ITEM</th>
-                            <th style="width: 50px;"></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td><input type="text" class="res-id" placeholder="ID"></td>
-                            <td><input type="text" class="ser-name" placeholder="Service"></td>
-                            <td><input type="text" class="tar-id" placeholder="Target"></td>
-                            <td>
-                                <select class="cfg-name">
-                                    <option value="Service_Port">Service_Port</option>
-                                    <option value="S-Vlan">S-Vlan</option>
-                                    <option value="Subscriber_Terminal_Port">Subscriber_Terminal_Port</option>
-                                    <option value="Service_Trail">Service_Trail</option>
-                                </select>
-                            </td>
-                            <td>
-                                <button class="btn-remove" onclick="removeRow(this)"><i data-lucide="trash-2"></i></button>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+                
+                <div class="table-container">
+                    <table id="dataTable" class="input-table">
+                        <thead>
+                            <tr>
+                                <th>RESOURCE ID</th>
+                                <th>SERVICE</th>
+                                <th>TARGET</th>
+                                <th>CONFIG</th>
+                                <th style="width: 40px;"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><input type="text" class="res-id" placeholder="ID"></td>
+                                <td><input type="text" class="ser-name" placeholder="Name"></td>
+                                <td><input type="text" class="tar-id" placeholder="Target"></td>
+                                <td>
+                                    <select class="cfg-name">
+                                        <option value="Service_Port">Service_Port</option>
+                                        <option value="S-Vlan">S-Vlan</option>
+                                        <option value="Subscriber_Terminal_Port">Sub_Port</option>
+                                        <option value="Service_Trail">Trail</option>
+                                    </select>
+                                </td>
+                                <td><button class="btn-remove" onclick="removeRow(this)">✕</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
 
-            <div class="footer-actions">
-                <button class="btn-ghost" onclick="addRow()"><i data-lucide="plus"></i> Tambah Baris</button>
-                <button class="btn-download" onclick="downloadCSV()"><i data-lucide="download"></i> Export ke CSV</button>
-            </div>
-            <p id="empty-msg" class="empty-state"></p>
-        </section>
+                <div class="footer-actions-sm">
+                    <button class="btn-ghost-sm" onclick="addRow()"><i data-lucide="plus"></i> Row</button>
+                    <button class="btn-download-sm" onclick="downloadCSV()"><i data-lucide="download"></i> Export CSV</button>
+                </div>
+                <p id="empty-msg" class="empty-state"></p>
+            </section>
+        </div>
     </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <script src="index.js"></script>
+    <script>lucide.createIcons();</script>
+</body>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     <script src="index.js"></script>
