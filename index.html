@@ -1,154 +1,116 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Input Alter Data</title>
-    <style>
-        body { 
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
-            margin: 40px; 
-            background-color: #f4f7f9; 
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start; 
-        }
-
-        .container { 
-            background: white; 
-            padding: 30px; 
-            border-radius: 12px; 
-            box-shadow: 0 8px 24px rgba(149, 157, 165, 0.2); 
-            width: 100%;
-            max-width: 1100px;
-        }
-
-        h2 { 
-            color: #2c3e50; 
-            margin-top: 0;
-            margin-bottom: 25px;
-            font-weight: 600;
-            border-bottom: 2px solid #edf2f7;
-            padding-bottom: 15px;
-        }
-
-        table { 
-            width: 100%; 
-            border-collapse: separate; 
-            border-spacing: 0; 
-            margin: 20px 0; 
-        }
-
-        th { 
-            background-color: #f8fafc; 
-            color: #4a5568; 
-            font-size: 12px; 
-            text-transform: uppercase; 
-            letter-spacing: 0.05em;
-            padding: 12px 15px;
-            border-top: 1px solid #e2e8f0;
-            border-bottom: 2px solid #e2e8f0;
-            text-align: left;
-        }
-
-        td { 
-            padding: 10px 15px; 
-            border-bottom: 1px solid #edf2f7;
-            vertical-align: middle;
-        }
-
-        input[type="text"], select { 
-            width: 100%; 
-            padding: 10px 12px; 
-            border: 1px solid #cbd5e0; 
-            border-radius: 6px; 
-            outline: none; 
-            font-size: 14px;
-            color: #2d3748;
-            transition: all 0.2s ease;
-            box-sizing: border-box; 
-        }
-
-        input[type="text"]:focus, select:focus { 
-            border-color: #4299e1; 
-            box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.15);
-        }
-
-        /* Styling untuk input yang error (validasi) */
-        input.error {
-            border-color: #e53e3e;
-            background-color: #fff5f5;
-        }
-
-        .btn-group { 
-            display: flex; 
-            gap: 12px; 
-            margin-top: 20px; 
-        }
-
-        button { 
-            padding: 10px 24px; 
-            cursor: pointer; 
-            border: none; 
-            border-radius: 6px; 
-            font-size: 14px;
-            font-weight: 600; 
-            transition: all 0.2s; 
-        }
-
-        .btn-add { background-color: #38a169; color: white; }
-        .btn-add:hover { background-color: #2f855a; }
-
-        .btn-download { background-color: #3182ce; color: white; }
-        .btn-download:hover { background-color: #2b6cb0; }
-
-        .btn-remove { 
-            background-color: transparent; 
-            color: #e53e3e; 
-            border: 1px solid #feb2b2;
-            padding: 8px 12px; 
-        }
-        .btn-remove:hover { background-color: #fff5f5; border-color: #e53e3e; }
-    </style>
+    <title>Network Hub Tools</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
-<div class="container">
-    <h2>Input Alter Data</h2>
-    <table id="dataTable">
-        <thead>
-            <tr>
-                <th>RESOURCE_ID</th>
-                <th>SERVICE_NAME</th>
-                <th>TARGET_ID</th>
-                <th>CONFIG_ITEM_NAME</th>
-                <th style="width: 50px;">Aksi</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td><input type="text" class="res-id" placeholder="ID"></td>
-                <td><input type="text" class="ser-name" placeholder="Name Service"></td>
-                <td><input type="text" class="tar-id" placeholder="ID Target"></td>
-                <td>
-                    <select class="cfg-name">
-                        <option value="Service_Port">Service_Port</option>
-                        <option value="S-Vlan">S-Vlan</option>
-                        <option value="Subscriber_Terminal_Port">Subscriber_Terminal_Port</option>
-                        <option value="Service_Trail">Service_Trail</option>
-                    </select>
-                </td>
-                <td><button class="btn-remove" onclick="removeRow(this)">✕</button></td>
-            </tr>
-        </tbody>
-    </table>
+    <div class="main-wrapper">
+        <header class="main-header">
+            <h1>Network Operations Hub</h1>
+            <p>Integrated Network Inventory & Service Extractor</p>
+        </header>
 
-    <div class="btn-group">
-        <button class="btn-add" onclick="addRow()">+ Add</button>
-        <button class="btn-download" onclick="downloadCSV()">Ekspor CSV</button>
+        <nav class="tabs-nav">
+            <button class="tab-btn active" onclick="openTab(event, 'inventory')">Inventory & Prov</button>
+            <button class="tab-btn" onclick="openTab(event, 'extractor')">Service ID Extractor</button>
+        </nav>
+
+        <div id="inventory" class="tab-content active">
+            <section class="card">
+                <div class="card-header">
+                    <h2><span>🔍</span> Search ID PORT & VLAN</h2>
+                </div>
+                <div class="input-container">
+                    <input id="ip" type="text" placeholder="IP Address" />
+                    <input id="slot" type="text" placeholder="Slot" />
+                    <input id="port" type="text" placeholder="Port" />
+                    <button id="search-btn">Cari Sekarang</button>
+                </div>
+                
+                <div class="table-responsive">
+                    <table id="result">
+                        <thead>
+                            <tr>
+                                <th>IP</th>
+                                <th>SLOT</th>
+                                <th>PORT</th>
+                                <th>VLAN</th>
+                                <th>ID_PORT</th>
+                                <th>GPON</th>
+                                <th>VENDOR</th>
+                            </tr>
+                        </thead>
+                        <tbody id="result-body"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section class="card">
+                <div class="card-header">
+                    <h2><span>⚙️</span> Alter Provisioning</h2>
+                </div>
+                <div class="table-responsive">
+                    <table id="dataTable">
+                        <thead>
+                            <tr>
+                                <th>RESOURCE_ID</th>
+                                <th>SERVICE_NAME</th>
+                                <th>TARGET_ID</th>
+                                <th>CONFIG_ITEM_NAME</th>
+                                <th style="width: 50px; text-align: center;">AKSI</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><input type="text" class="res-id" placeholder="ID"></td>
+                                <td><input type="text" class="ser-name" placeholder="Name"></td>
+                                <td><input type="text" class="tar-id" placeholder="Target"></td>
+                                <td>
+                                    <select class="cfg-name">
+                                        <option value="Service_Port">Service_Port</option>
+                                        <option value="S-Vlan">S-Vlan</option>
+                                        <option value="Subscriber_Terminal_Port">Subscriber_Terminal_Port</option>
+                                        <option value="Service_Trail">Service_Trail</option>
+                                    </select>
+                                </td>
+                                <td style="text-align: center;">
+                                    <button class="btn-remove" onclick="removeRow(this)">✕</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="btn-group">
+                    <button class="btn-add" onclick="addRow()">+ Tambah Baris</button>
+                    <button class="btn-download" onclick="downloadCSV()">Export ke CSV</button>
+                </div>
+            </section>
+        </div>
+
+        <div id="extractor" class="tab-content">
+            <section class="card">
+                <div class="card-header">
+                    <h2><span>📋</span> Service ID Extractor</h2>
+                </div>
+                <div class="input-section">
+                    <label for="inputText">Tempel teks Log di sini:</label>
+                    <textarea id="inputText" placeholder="Contoh: Service ID is 3-48WW9WMJ..."></textarea>
+                    <button id="btnExtract" class="btn-primary">Ekstrak Data</button>
+                </div>
+                <div id="resultArea" class="result-section hidden">
+                    <h3>Hasil Pemisahan:</h3>
+                    <div id="outputList"></div>
+                </div>
+            </section>
+        </div>
     </div>
-</div>
 
-<script src="script.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <script src="index.js"></script>
 </body>
 </html>
