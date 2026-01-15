@@ -172,12 +172,42 @@ window.copyText = function(text) {
     navigator.clipboard.writeText(text).then(() => alert("Copied!"));
 };
 
+// --- FITUR DARK MODE ---
 const themeToggle = document.getElementById('theme-toggle');
+const body = document.body;
+
+// 1. Fungsi untuk memperbarui ikon secara dinamis
+function updateThemeIcon(isDark) {
+    const iconElement = document.querySelector('#theme-toggle i');
+    if (iconElement) {
+        // Ganti atribut data-lucide
+        iconElement.setAttribute('data-lucide', isDark ? 'sun' : 'moon');
+        // Render ulang hanya ikon tersebut
+        lucide.createIcons();
+    }
+}
+
+// 2. Cek preferensi tema yang tersimpan di localStorage saat halaman dimuat
+const savedTheme = localStorage.getItem('theme') || 'light';
+if (savedTheme === 'dark') {
+    body.setAttribute('data-theme', 'dark');
+    updateThemeIcon(true);
+}
+
+// 3. Event Listener untuk tombol Toggle
 themeToggle.addEventListener('click', () => {
-    const isDark = document.body.getAttribute('data-theme') === 'dark';
-    document.body.toggleAttribute('data-theme', !isDark);
-    localStorage.setItem('theme', !isDark ? 'dark' : 'light');
-    lucide.createIcons();
+    const isNowDark = body.getAttribute('data-theme') !== 'dark';
+    
+    if (isNowDark) {
+        body.setAttribute('data-theme', 'dark');
+        localStorage.setItem('theme', 'dark');
+        updateThemeIcon(true);
+    } else {
+        body.removeAttribute('data-theme');
+        localStorage.setItem('theme', 'light');
+        updateThemeIcon(false);
+    }
 });
+
 
 init();
