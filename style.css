@@ -127,7 +127,7 @@ td { padding: 6px 8px; border-bottom: 1px solid var(--border); }
 
 /* Slot dan Port biasanya angkanya sedikit, kita perpendek */
 #slot, #port {
-    flex: 0 0 80px; 
+    flex: 0 0 60px; 
 }
 
 /* Tombol cari tetap proporsional */
@@ -155,4 +155,5 @@ td { padding: 6px 8px; border-bottom: 1px solid var(--border); }
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
 }
+
 
