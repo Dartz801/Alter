@@ -33,9 +33,8 @@ function init() {
     });
 }
 
-// Event Listener untuk tombol cari
+// --- MODIFIKASI: Event Listener untuk tombol cari ---
 document.getElementById("search-btn").addEventListener("click", () => {
-    // Ambil nilai input
     const inputIP = document.getElementById("ip").value.trim();
     const inputSlot = document.getElementById("slot").value.trim();
     const inputPort = document.getElementById("port").value.trim();
@@ -44,6 +43,58 @@ document.getElementById("search-btn").addEventListener("click", () => {
         alert("Mohon isi semua field: IP, Slot, dan Port");
         return;
     }
+
+    const filteredData = data.filter((item) => {
+        return (
+            String(item.IP || "").trim() === inputIP && 
+            String(item.SLOT || "").trim() === inputSlot && 
+            String(item.PORT || "").trim() === inputPort
+        );
+    });
+
+    renderTable(filteredData);
+
+    // AUTO-FILL LOGIC: Jika data ditemukan, masukkan ke Alter Provisioning
+    if (filteredData.length > 0) {
+        autoFillAlterProv(filteredData[0]);
+    }
+});
+
+// --- FUNGSI BARU: Auto Fill ke Tabel Alter Provisioning ---
+function autoFillAlterProv(item) {
+    const tbody = document.querySelector("#dataTable tbody");
+    
+    // Hapus baris pertama jika masih kosong (opsional, agar rapi)
+    const firstRowInput = tbody.rows[0]?.querySelector(".res-id");
+    if (firstRowInput && firstRowInput.value === "") {
+        tbody.innerHTML = "";
+    }
+
+    // Definisikan pemetaan data (VLAN -> S-Vlan, ID_PORT -> Service_Port)
+    const mappings = [
+        { id: item.VLAN, config: "S-Vlan" },
+        { id: item.ID_PORT, config: "Service_Port" }
+    ];
+
+    mappings.forEach(map => {
+        const newRow = document.createElement("tr");
+        newRow.innerHTML = `
+            <td><input type="text" class="res-id" value="${map.id || ''}" placeholder="ID"></td>
+            <td><input type="text" class="ser-name" placeholder="Service"></td>
+            <td><input type="text" class="tar-id" placeholder="Target"></td>
+            <td>
+                <select class="cfg-name">
+                    <option value="Service_Port" ${map.config === 'Service_Port' ? 'selected' : ''}>Service_Port</option>
+                    <option value="S-Vlan" ${map.config === 'S-Vlan' ? 'selected' : ''}>S-Vlan</option>
+                    <option value="Subscriber_Terminal_Port">Sub_Port</option>
+                    <option value="Service_Trail">Trail</option>
+                </select>
+            </td>
+            <td style="text-align: center;"><button class="btn-remove" onclick="removeRow(this)">✕</button></td>
+        `;
+        tbody.appendChild(newRow);
+    });
+}
 
     // Filter data berdasarkan input
     const filteredData = data.filter((item) => {
@@ -220,6 +271,8 @@ function updateIcon(isDark) {
     themeIcon.setAttribute('data-lucide', iconName);
     lucide.createIcons(); 
 }
+
+
 
 // Jalankan fungsi init saat halaman dimuat
 init();
