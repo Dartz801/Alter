@@ -157,24 +157,52 @@ window.downloadCSV = function() {
 document.getElementById('btnExtract').addEventListener('click', function() {
     const input = document.getElementById('inputText').value;
     const outputList = document.getElementById('outputList');
-    const services = input.includes("Service ID is ") ? input.split("Service ID is ")[1].trim().split(',') : input.trim().split(',');
-    
-    outputList.innerHTML = "";
-    if (services[0] !== "") {
-        document.getElementById('resultArea').classList.remove('hidden');
-        services.forEach(item => {
+    const resultArea = document.getElementById('resultArea');
+    const tbody = document.querySelector("#dataTable tbody");
+
+    // Ekstraksi data service
+    const keyword = "Service ID is ";
+    let targetText = input.includes(keyword) ? input.split(keyword)[1] : input;
+    const services = targetText.trim().split(',').map(s => s.trim()).filter(s => s !== "");
+
+    outputList.innerHTML = ""; 
+
+    if (services.length > 0) {
+        resultArea.classList.remove('hidden');
+        
+        services.forEach((cleanItem, index) => {
+            // 1. Tampilkan di panel kiri (Visual Service Selector)
             const div = document.createElement('div');
             div.className = 'service-card';
-            div.innerHTML = `<span>${item.trim()}</span><button class="copy-btn" onclick="copyText('${item.trim()}')"><i data-lucide="copy"></i></button>`;
+            div.innerHTML = `
+                <span>${cleanItem}</span>
+                <button class="copy-btn" onclick="copyText('${cleanItem}')" title="Salin">
+                    <i data-lucide="copy" style="width:16px; height:16px"></i>
+                </button>
+            `;
             outputList.appendChild(div);
+
+            // 2. LOGIKA AUTO-ADD ROW & FILL
+            // Jika baris di tabel kanan (Alter Prov) kurang, tambahkan baris baru
+            if (!tbody.rows[index]) {
+                window.addRow(); // Memanggil fungsi addRow yang sudah ada
+            }
+
+            // Isi nilai ke kolom SERVICE_NAME
+            const currentRow = tbody.rows[index];
+            if (currentRow) {
+                const serviceInput = currentRow.querySelector(".ser-name");
+                if (serviceInput) {
+                    serviceInput.value = cleanItem;
+                }
+            }
         });
-        lucide.createIcons();
+        
+        lucide.createIcons(); // Re-render icon lucide
+    } else {
+        alert("Mohon masukkan data yang valid.");
     }
 });
-
-window.copyText = function(text) {
-    navigator.clipboard.writeText(text).then(() => alert("Copied!"));
-};
 
 // --- FITUR DARK MODE ---
 const themeToggle = document.getElementById('theme-toggle');
