@@ -191,6 +191,23 @@ document.getElementById('btnExtract').addEventListener('click', function() {
 });
 
 
+window.clearTable = function() {
+    // Gunakan konfirmasi agar tidak sengaja terhapus
+    if (confirm("Kosongkan semua data di tabel Alter Provisioning?")) {
+        const tbody = document.querySelector("#dataTable tbody");
+        
+        // Animasi fade out (opsional)
+        tbody.style.opacity = "0";
+        
+        setTimeout(() => {
+            tbody.innerHTML = "";
+            // Setelah kosong, siapkan 1 baris default agar tabel tidak terlihat 'patah'
+            window.addRow();
+            tbody.style.opacity = "1";
+            logStatus("Tabel berhasil dibersihkan.");
+        }, 200);
+    }
+};
 
 
 // --- FITUR DARK MODE ---
