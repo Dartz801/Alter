@@ -33,18 +33,22 @@ function init() {
     });
 }
 
-// --- MODIFIKASI: Event Listener untuk tombol cari ---
+// Event Listener untuk tombol cari
 document.getElementById("search-btn").addEventListener("click", () => {
+    // Ambil nilai input
     const inputIP = document.getElementById("ip").value.trim();
     const inputSlot = document.getElementById("slot").value.trim();
     const inputPort = document.getElementById("port").value.trim();
 
     if (!inputIP || !inputSlot || !inputPort) {
         alert("Mohon isi semua field: IP, Slot, dan Port");
-        return;
+        return; 
     }
 
+    // Filter data berdasarkan input
     const filteredData = data.filter((item) => {
+        // PERBAIKAN: Pastikan nama properti (IP, SLOT, PORT) sesuai dengan header di Google Sheet
+        // Gunakan trim() pada data sheet juga untuk menghindari spasi tak terlihat
         return (
             String(item.IP || "").trim() === inputIP && 
             String(item.SLOT || "").trim() === inputSlot && 
@@ -53,12 +57,38 @@ document.getElementById("search-btn").addEventListener("click", () => {
     });
 
     renderTable(filteredData);
-
     // AUTO-FILL LOGIC: Jika data ditemukan, masukkan ke Alter Provisioning
     if (filteredData.length > 0) {
         autoFillAlterProv(filteredData[0]);
     }
 });
+
+const renderTable = (filteredData) => {
+    const tbody = document.getElementById("result-body");
+    const emptyMsg = document.getElementById("empty-msg");
+
+    tbody.innerHTML = "";
+    if (emptyMsg) emptyMsg.textContent = "";
+
+    if (filteredData.length === 0) {
+        if (emptyMsg) emptyMsg.textContent = "Tidak ada data yang ditemukan.";
+        return;
+    }
+
+    filteredData.forEach((item) => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+            <td>${item.IP || '-'}</td>
+            <td>${item.SLOT || '-'}</td>
+            <td>${item.PORT || '-'}</td>
+            <td>${item.VLAN || '-'}</td>
+            <td>${item.ID_PORT || '-'}</td>
+            <td>${item.GPON || '-'}</td>
+            <td>${item.VENDOR || '-'}</td>
+        `;
+        tbody.appendChild(row);
+    });
+};
 
 // --- FUNGSI BARU: Auto Fill ke Tabel Alter Provisioning ---
 function autoFillAlterProv(item) {
@@ -95,48 +125,6 @@ function autoFillAlterProv(item) {
         tbody.appendChild(newRow);
     });
 }
-
-    // Filter data berdasarkan input
-    const filteredData = data.filter((item) => {
-        // PERBAIKAN: Pastikan nama properti (IP, SLOT, PORT) sesuai dengan header di Google Sheet
-        // Gunakan trim() pada data sheet juga untuk menghindari spasi tak terlihat
-        return (
-            String(item.IP || "").trim() === inputIP && 
-            String(item.SLOT || "").trim() === inputSlot && 
-            String(item.PORT || "").trim() === inputPort
-        );
-    });
-
-    renderTable(filteredData);
-});
-
-const renderTable = (filteredData) => {
-    const tbody = document.getElementById("result-body");
-    const emptyMsg = document.getElementById("empty-msg");
-
-    tbody.innerHTML = "";
-    if (emptyMsg) emptyMsg.textContent = "";
-
-    if (filteredData.length === 0) {
-        if (emptyMsg) emptyMsg.textContent = "Tidak ada data yang ditemukan.";
-        return;
-    }
-
-    filteredData.forEach((item) => {
-        const row = document.createElement("tr");
-        row.innerHTML = `
-            <td>${item.IP || '-'}</td>
-            <td>${item.SLOT || '-'}</td>
-            <td>${item.PORT || '-'}</td>
-            <td>${item.VLAN || '-'}</td>
-            <td>${item.ID_PORT || '-'}</td>
-            <td>${item.GPON || '-'}</td>
-            <td>${item.VENDOR || '-'}</td>
-        `;
-        tbody.appendChild(row);
-    });
-};
-
 
 //-- Fungsi untuk Mengambil Service dari BIMA
 
