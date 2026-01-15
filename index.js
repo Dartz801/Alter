@@ -73,19 +73,24 @@ function renderInventoryTable(filteredData) {
 
 function autoFillAlterProv(item) {
     const tbody = document.querySelector("#dataTable tbody");
-    tbody.innerHTML = ""; // Bersihkan tabel agar fresh saat search baru
+    tbody.innerHTML = ""; // Reset tabel agar bersih
 
-    // Definisi Mapping sesuai permintaan:
-    // Internet & Voice (ID_PORT), Internet (VLAN_NET), Voice (VLAN_VOIP)
-    const rowsToCreate = [
-        { id: item.ID_PORT, config: "Service_Port", note: "Internet/General" },
-        { id: item.ID_PORT, config: "Service_Port", note: "Voice/IPTV" },
-        { id: item.VLAN_NET, config: "S-Vlan", note: "Internet" },
-        { id: item.VLAN_VOIP, config: "S-Vlan", note: "Voice" }
+    const mappings = [
+        // Pasangan Internet
+        { id: item.ID_PORT, config: "Service_Port" }, // Baris 1
+        // Pasangan Voice
+        { id: item.ID_PORT, config: "Service_Port" }, // Baris 2
+        // Pasangan IPTV
+        { id: item.ID_PORT, config: "Service_Port" }, // Baris 3
+        
+        // S-Vlan Mapping
+        { id: item.VLAN_NET, config: "S-Vlan" },      // Baris 4 (Internet)
+        { id: item.VLAN_VOIP, config: "S-Vlan" },     // Baris 5 (Voice)
+        { id: item.GPON, config: "S-Vlan" }           // Baris 6 (IPTV - Menggunakan GPON/VLAN IPTV)
     ];
 
-    rowsToCreate.forEach(rowData => {
-        createNewRow(rowData.id, rowData.config);
+    mappings.forEach(map => {
+        createNewRow(map.id, map.config);
     });
 }
 
@@ -153,48 +158,45 @@ window.downloadCSV = function() {
 // 5. Fungsi Theme & Service Selector (Tetap Ada)
 document.getElementById('btnExtract').addEventListener('click', function() {
     const input = document.getElementById('inputText').value;
-    const outputList = document.getElementById('outputList');
     const tbody = document.querySelector("#dataTable tbody");
-
     const keyword = "Service ID is ";
+    
     let targetText = input.includes(keyword) ? input.split(keyword)[1] : input;
     const services = targetText.trim().split(',').map(s => s.trim()).filter(s => s !== "");
 
-    outputList.innerHTML = ""; 
-
-    if (services.length > 0) {
-        document.getElementById('resultArea').classList.remove('hidden');
-        
-        services.forEach((cleanItem, index) => {
-            // 1. Render Visual Card di Panel Kiri
-            const div = document.createElement('div');
-            div.className = 'service-card';
-            div.innerHTML = `
-                <span>${cleanItem}</span>
-                <button class="copy-btn" onclick="copyText('${cleanItem}')">
-                    <i data-lucide="copy" style="width:16px; height:16px"></i>
-                </button>
-            `;
-            outputList.appendChild(div);
-
-            // 2. Isi ke Kolom SERVICE_NAME di Tabel Alter Provisioning
-            // Jika baris belum ada (misal input service lebih banyak dari data inventory), buat baris baru
-            if (!tbody.rows[index]) {
-                window.addRow();
-            }
-
-            const currentRow = tbody.rows[index];
-            const serviceInput = currentRow.querySelector(".ser-name");
-            if (serviceInput) {
-                serviceInput.value = cleanItem;
-            }
-        });
-        
-        lucide.createIcons();
-    } else {
-        alert("Mohon masukkan data service yang valid.");
+    if (services.length < 3) {
+        alert("Peringatan: Data service kurang dari 3 (Internet, Voice, IPTV).");
     }
+
+    // Ambil data service (dengan fallback jika data tidak ada)
+    const srvInternet = services[0] || "";
+    const srvVoice    = services[1] || "";
+    const srvIPTV     = services[2] || "";
+
+    // Pastikan tabel memiliki minimal 6 baris
+    while (tbody.rows.length < 6) {
+        window.addRow();
+    }
+
+    // --- DISTRIBUSI OTOMATIS KE KOLOM SERVICE_NAME ---
+    
+    // Baris 1 & 4 untuk INTERNET
+    if(tbody.rows[0]) tbody.rows[0].querySelector(".ser-name").value = srvInternet;
+    if(tbody.rows[3]) tbody.rows[3].querySelector(".ser-name").value = srvInternet;
+    
+    // Baris 2 & 5 untuk VOICE
+    if(tbody.rows[1]) tbody.rows[1].querySelector(".ser-name").value = srvVoice;
+    if(tbody.rows[4]) tbody.rows[4].querySelector(".ser-name").value = srvVoice;
+    
+    // Baris 3 & 6 untuk IPTV
+    if(tbody.rows[2]) tbody.rows[2].querySelector(".ser-name").value = srvIPTV;
+    if(tbody.rows[5]) tbody.rows[5].querySelector(".ser-name").value = srvIPTV;
+
+    logStatus("Service Name berhasil didistribusikan ke 6 baris.");
 });
+
+
+
 
 // --- FITUR DARK MODE ---
 const themeToggle = document.getElementById('theme-toggle');
