@@ -73,22 +73,19 @@ function renderInventoryTable(filteredData) {
 
 function autoFillAlterProv(item) {
     const tbody = document.querySelector("#dataTable tbody");
-    
-    // Cek jika baris pertama kosong, hapus dulu agar rapi
-    if (tbody.rows.length === 1 && tbody.rows[0].querySelector(".res-id").value === "") {
-        tbody.innerHTML = "";
-    }
+    tbody.innerHTML = ""; // Bersihkan tabel agar fresh saat search baru
 
-    const mappings = [
-        { id: item.ID_PORT, config: "Service_Port" },
-        { id: item.ID_PORT, config: "Service_Port" },
-        { id: item.VLAN_NET, config: "S-Vlan" },
-        { id: item.VLAN_VOIP, config: "S-Vlan" }
-
+    // Definisi Mapping sesuai permintaan:
+    // Internet & Voice (ID_PORT), Internet (VLAN_NET), Voice (VLAN_VOIP)
+    const rowsToCreate = [
+        { id: item.ID_PORT, config: "Service_Port", note: "Internet/General" },
+        { id: item.ID_PORT, config: "Service_Port", note: "Voice/IPTV" },
+        { id: item.VLAN_NET, config: "S-Vlan", note: "Internet" },
+        { id: item.VLAN_VOIP, config: "S-Vlan", note: "Voice" }
     ];
 
-    mappings.forEach(map => {
-        createNewRow(map.id, map.config);
+    rowsToCreate.forEach(rowData => {
+        createNewRow(rowData.id, rowData.config);
     });
 }
 
@@ -157,10 +154,8 @@ window.downloadCSV = function() {
 document.getElementById('btnExtract').addEventListener('click', function() {
     const input = document.getElementById('inputText').value;
     const outputList = document.getElementById('outputList');
-    const resultArea = document.getElementById('resultArea');
     const tbody = document.querySelector("#dataTable tbody");
 
-    // Ekstraksi data service
     const keyword = "Service ID is ";
     let targetText = input.includes(keyword) ? input.split(keyword)[1] : input;
     const services = targetText.trim().split(',').map(s => s.trim()).filter(s => s !== "");
@@ -168,39 +163,36 @@ document.getElementById('btnExtract').addEventListener('click', function() {
     outputList.innerHTML = ""; 
 
     if (services.length > 0) {
-        resultArea.classList.remove('hidden');
+        document.getElementById('resultArea').classList.remove('hidden');
         
         services.forEach((cleanItem, index) => {
-            // 1. Tampilkan di panel kiri (Visual Service Selector)
+            // 1. Render Visual Card di Panel Kiri
             const div = document.createElement('div');
             div.className = 'service-card';
             div.innerHTML = `
                 <span>${cleanItem}</span>
-                <button class="copy-btn" onclick="copyText('${cleanItem}')" title="Salin">
+                <button class="copy-btn" onclick="copyText('${cleanItem}')">
                     <i data-lucide="copy" style="width:16px; height:16px"></i>
                 </button>
             `;
             outputList.appendChild(div);
 
-            // 2. LOGIKA AUTO-ADD ROW & FILL
-            // Jika baris di tabel kanan (Alter Prov) kurang, tambahkan baris baru
+            // 2. Isi ke Kolom SERVICE_NAME di Tabel Alter Provisioning
+            // Jika baris belum ada (misal input service lebih banyak dari data inventory), buat baris baru
             if (!tbody.rows[index]) {
-                window.addRow(); // Memanggil fungsi addRow yang sudah ada
+                window.addRow();
             }
 
-            // Isi nilai ke kolom SERVICE_NAME
             const currentRow = tbody.rows[index];
-            if (currentRow) {
-                const serviceInput = currentRow.querySelector(".ser-name");
-                if (serviceInput) {
-                    serviceInput.value = cleanItem;
-                }
+            const serviceInput = currentRow.querySelector(".ser-name");
+            if (serviceInput) {
+                serviceInput.value = cleanItem;
             }
         });
         
-        lucide.createIcons(); // Re-render icon lucide
+        lucide.createIcons();
     } else {
-        alert("Mohon masukkan data yang valid.");
+        alert("Mohon masukkan data service yang valid.");
     }
 });
 
