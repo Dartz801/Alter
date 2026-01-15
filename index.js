@@ -86,7 +86,6 @@ function autoFillAlterProv(item) {
         // S-Vlan Mapping
         { id: item.VLAN_NET, config: "S-Vlan" },      // Baris 4 (Internet)
         { id: item.VLAN_VOIP, config: "S-Vlan" },     // Baris 5 (Voice)
-        { id: item.GPON, config: "S-Vlan" }           // Baris 6 (IPTV - Menggunakan GPON/VLAN IPTV)
     ];
 
     mappings.forEach(map => {
@@ -164,9 +163,6 @@ document.getElementById('btnExtract').addEventListener('click', function() {
     let targetText = input.includes(keyword) ? input.split(keyword)[1] : input;
     const services = targetText.trim().split(',').map(s => s.trim()).filter(s => s !== "");
 
-    if (services.length < 3) {
-        alert("Peringatan: Data service kurang dari 3 (Internet, Voice, IPTV).");
-    }
 
     // Ambil data service (dengan fallback jika data tidak ada)
     const srvInternet = services[0] || "";
