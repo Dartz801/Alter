@@ -186,7 +186,6 @@ document.getElementById('btnExtract').addEventListener('click', function() {
     
     // Baris 3 & 6 untuk IPTV
     if(tbody.rows[2]) tbody.rows[2].querySelector(".ser-name").value = srvIPTV;
-    if(tbody.rows[5]) tbody.rows[5].querySelector(".ser-name").value = srvIPTV;
 
     logStatus("Service Name berhasil didistribusikan ke 6 baris.");
 });
