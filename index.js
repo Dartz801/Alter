@@ -1,4 +1,4 @@
-const sheetUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR_LsggdPOwSms8SO0wuSEiMAIdyMjYlt0G9z71aZa2gy0ngATMJiakSa_a7cygOFa1WhCinsfHk3AQ/pub?gid=1252451747&single=true&output=csv";
+const sheetUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQmM58_LHgxH2bvHvgwHL6gAifeooASymk2Kh88ozV-ekzalPlCSUBYhMvlx-mvTuX1W3W9rolokmAE/pub?gid=0&single=true&output=csv";
 
 let data = [];
 
@@ -62,7 +62,8 @@ function renderInventoryTable(filteredData) {
             <td>${item.IP || '-'}</td>
             <td>${item.SLOT || '-'}</td>
             <td>${item.PORT || '-'}</td>
-            <td>${item.VLAN || '-'}</td>
+            <td>${item.VLAN_NET || '-'}</td>
+            <td>${item.VLAN_VOIP || '-'}</td>
             <td>${item.ID_PORT || '-'}</td>
             <td>${item.GPON || '-'}</td>
         `;
@@ -79,8 +80,11 @@ function autoFillAlterProv(item) {
     }
 
     const mappings = [
-        { id: item.VLAN, config: "S-Vlan" },
-        { id: item.ID_PORT, config: "Service_Port" }
+        { id: item.ID_PORT, config: "Service_Port" },
+        { id: item.ID_PORT, config: "Service_Port" },
+        { id: item.VLAN_NET, config: "S-Vlan" },
+        { id: item.VLAN_VOIP, config: "S-Vlan" }
+
     ];
 
     mappings.forEach(map => {
