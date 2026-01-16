@@ -315,21 +315,24 @@ async function executeBulkUpdate() {
 }
 
 function openTab(evt, tabName) {
-    // Sembunyikan semua konten tab
+    // Sembunyikan semua tab content
     const tabContents = document.getElementsByClassName("tab-content");
     for (let i = 0; i < tabContents.length; i++) {
         tabContents[i].classList.remove("active");
     }
 
-    // Hilangkan status active dari semua tombol tab
+    // Nonaktifkan semua tombol tab
     const tabButtons = document.getElementsByClassName("tab-btn");
     for (let i = 0; i < tabButtons.length; i++) {
         tabButtons[i].classList.remove("active");
     }
 
-    // Tampilkan tab yang dipilih dan tambahkan class active pada tombolnya
+    // Tampilkan tab yang diklik
     document.getElementById(tabName).classList.add("active");
     evt.currentTarget.classList.add("active");
+    
+    // Refresh icon Lucide jika diperlukan
+    lucide.createIcons();
 }
 
 init();

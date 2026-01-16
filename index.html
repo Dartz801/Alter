@@ -29,11 +29,11 @@
             <button class="tab-btn active" onclick="openTab(event, 'search-tab')">
                 <i data-lucide="search"></i> Search
             </button>
-            <button class="tab-btn" onclick="openTab(event, 'bulk-tab')">
-                <i data-lucide="refresh-cw"></i> Bulk Update
-            </button>
             <button class="tab-btn" onclick="openTab(event, 'service-tab')">
                 <i data-lucide="terminal"></i> Service
+            </button>
+            <button class="tab-btn" onclick="openTab(event, 'bulk-tab')">
+                <i data-lucide="refresh-cw"></i> Bulk
             </button>
         </div>
 
@@ -62,28 +62,28 @@
             </div>
         </div>
 
-        <div id="bulk-tab" class="tab-content">
-            <div class="card-header-sm">
-                <h2>Update VLAN VOIP Massal</h2>
-            </div>
-            <div class="extractor-mini">
-                <input type="text" id="bulk-ip" placeholder="Masukkan IP Perangkat...">
-                <input type="number" id="bulk-vlan" placeholder="VLAN VOIP Baru (e.g. 200)">
-                <div id="bulk-preview" class="hidden preview-box"></div>
-                <div style="display: flex; gap: 5px; margin-top: 10px;">
-                    <button onclick="previewBulkUpdate()" class="btn-secondary-sm" style="flex: 1;">Preview</button>
-                    <button id="btn-execute-bulk" onclick="executeBulkUpdate()" class="btn-primary-sm" style="flex: 1; background: #8b5cf6;" disabled>Update All</button>
-                </div>
-            </div>
-        </div>
-
         <div id="service-tab" class="tab-content">
             <div class="card-header-sm">
                 <h2>Service Selector</h2>
             </div>
             <div class="extractor-mini">
-                <textarea id="inputText" placeholder="Paste Detail BIMA..." style="height: 120px;"></textarea>
+                <textarea id="inputText" placeholder="Paste Detail BIMA..." style="height: 150px;"></textarea>
                 <button id="btnExtract" class="btn-secondary-sm">Generate</button>
+            </div>
+        </div>
+
+        <div id="bulk-tab" class="tab-content">
+            <div class="card-header-sm">
+                <h2 style="color: #8b5cf6;">Update VLAN VOIP Massal</h2>
+            </div>
+            <div class="extractor-mini">
+                <input type="text" id="bulk-ip" placeholder="Masukkan IP Perangkat..." style="width: 100%; margin-bottom: 8px;">
+                <input type="number" id="bulk-vlan" placeholder="VLAN VOIP Baru (e.g. 200)" style="width: 100%; margin-bottom: 8px;">
+                <div id="bulk-preview" class="hidden preview-box" style="margin-bottom: 10px;"></div>
+                <div style="display: flex; gap: 5px;">
+                    <button onclick="previewBulkUpdate()" class="btn-secondary-sm" style="flex: 1;">Preview</button>
+                    <button id="btn-execute-bulk" onclick="executeBulkUpdate()" class="btn-primary-sm" style="flex: 1; background: #8b5cf6;" disabled>Update All</button>
+                </div>
             </div>
         </div>
     </div>

@@ -208,63 +208,46 @@ td { padding: 6px 8px; border-bottom: 1px solid var(--border); }
 /* Container Navigasi Tab */
 .tab-navigation {
     display: flex;
+    background: #f8fafc;
+    border-radius: 8px 8px 0 0;
+    padding: 5px;
     border-bottom: 1px solid #e2e8f0;
-    margin-bottom: 15px;
-    gap: 5px;
 }
 
 .tab-btn {
     flex: 1;
-    padding: 12px 5px;
+    padding: 10px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #64748b;
     border: none;
     background: none;
     cursor: pointer;
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    font-size: 13px;
-    font-weight: 600;
-    color: #64748b;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
-    transition: all 0.3s ease;
-    border-bottom: 2px solid transparent;
-}
-
-.tab-btn i {
-    width: 16px;
-    height: 16px;
+    gap: 6px;
+    border-radius: 6px;
+    transition: all 0.2s;
 }
 
 .tab-btn.active {
-    color: #8b5cf6;
-    border-bottom: 2px solid #8b5cf6;
+    background: white;
+    color: #5d5fef;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
 
-.tab-btn:hover {
-    background-color: #f8fafc;
-}
-
-/* Mengatur konten tab */
 .tab-content {
-    display: none; /* Sembunyikan semua tab secara default */
+    display: none;
+    padding: 15px;
 }
 
 .tab-content.active {
-    display: block; /* Tampilkan tab yang aktif */
-    animation: fadeIn 0.3s ease;
+    display: block;
+    animation: slideUp 0.3s ease-out;
 }
 
-.preview-box {
-    background: #f1f5f9;
-    padding: 10px;
-    border-radius: 6px;
-    font-size: 12px;
-    margin-top: 10px;
-    border-left: 3px solid #8b5cf6;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(5px); }
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(10px); }
     to { opacity: 1; transform: translateY(0); }
 }
