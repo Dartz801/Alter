@@ -335,4 +335,73 @@ function openTab(evt, tabName) {
     lucide.createIcons();
 }
 
+// --- Fungsi Attribute Processor (Vertikal ke Horizontal) ---
+
+document.getElementById('btnProcessAttr').addEventListener('click', function() {
+    const input = document.getElementById('inputAttr').value.trim();
+    if (!input) return alert("Data kosong!");
+
+    const lines = input.split(/\n/).map(line => line.trim()).filter(line => line !== "");
+    const dataMap = {};
+    const attributes = new Set();
+
+    // Logika: Membaca 3 baris sekaligus (ID, Key, Value)
+    for (let i = 0; i < lines.length; i += 3) {
+        const id = lines[i];
+        const key = lines[i + 1];
+        const value = lines[i + 2];
+
+        if (id && key && value) {
+            if (!dataMap[id]) dataMap[id] = { "ID": id };
+            dataMap[id][key] = value;
+            attributes.add(key);
+        }
+    }
+
+    renderAttrTable(dataMap, Array.from(attributes));
+});
+
+function renderAttrTable(dataMap, attrList) {
+    const head = document.getElementById('attrHead');
+    const body = document.getElementById('attrBody');
+    const outputArea = document.getElementById('attrOutputArea');
+
+    // Header: Tanpa kolom ID
+    let headHTML = `<tr>`;
+    attrList.forEach(attr => headHTML += `<th>${attr}</th>`);
+    headHTML += `</tr>`;
+    head.innerHTML = headHTML;
+
+    // Body: Tanpa kolom ID
+    let bodyHTML = "";
+    Object.values(dataMap).forEach(row => {
+        bodyHTML += `<tr>`;
+        attrList.forEach(attr => {
+            bodyHTML += `<td>${row[attr] || '-'}</td>`;
+        });
+        bodyHTML += `</tr>`;
+    });
+    body.innerHTML = bodyHTML;
+    
+    outputArea.classList.remove('hidden');
+    lucide.createIcons();
+}
+
+// Fungsi Copy Table ke Clipboard (Agar bisa langsung paste ke Excel)
+document.getElementById('btnCopyAttr').addEventListener('click', function() {
+    const table = document.getElementById('attrResultTable');
+    const range = document.createRange();
+    range.selectNode(table);
+    window.getSelection().removeAllRanges();
+    window.getSelection().addRange(range);
+    document.execCommand('copy');
+    window.getSelection().removeAllRanges();
+    alert("Tabel berhasil disalin!");
+});
+
+document.getElementById('btnClearAttr').addEventListener('click', () => {
+    document.getElementById('inputAttr').value = "";
+    document.getElementById('attrOutputArea').classList.add('hidden');
+});
+
 init();
