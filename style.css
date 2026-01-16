@@ -189,3 +189,18 @@ td { padding: 6px 8px; border-bottom: 1px solid var(--border); }
     background-color: #dc2626;
     color: #ffffff;
 }
+
+.hidden { display: none; }
+
+.text-purple { color: #8b5cf6; }
+
+.btn-primary-sm:disabled {
+    background-color: #cbd5e1 !important;
+    cursor: not-allowed;
+}
+
+/* Mempercantik input di side panel */
+.extractor-mini input::placeholder {
+    color: #94a3b8;
+    font-size: 13px;
+}

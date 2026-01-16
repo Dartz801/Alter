@@ -59,9 +59,6 @@ function renderInventoryTable(filteredData) {
     filteredData.forEach((item) => {
         const row = document.createElement("tr");
         row.innerHTML = `
-            <td>${item.IP || '-'}</td>
-            <td>${item.SLOT || '-'}</td>
-            <td>${item.PORT || '-'}</td>
             <td>${item.VLAN_NET || '-'}</td>
             <td>${item.VLAN_VOIP || '-'}</td>
             <td>${item.ID_PORT || '-'}</td>
@@ -88,7 +85,7 @@ function autoFillAlterProv(item) {
         { id: item.VLAN_VOIP, config: "S-Vlan" },     // Baris 5 (Voice)
     ];
 
-    mappings.forEach(map => {
+    mappings.forEach(map => {  
         createNewRow(map.id, map.config);
     });
 }
@@ -247,5 +244,78 @@ themeToggle.addEventListener('click', () => {
     }
 });
 
+
+// --- Fungsi Bulk Update VLAN VOIP ---
+const scriptUrl = "https://script.google.com/macros/s/AKfycbzpTkxVEf0LNuRleFuDIgDujfxqLLCeqofh8-aASy_CUEJrwLqWpUMgBhcJw1XWr1HO/exec";
+
+function previewBulkUpdate() {
+    const ipValue = document.getElementById('bulk-ip').value.trim();
+    const vlanValue = document.getElementById('bulk-vlan').value.trim();
+    const previewBox = document.getElementById('bulk-preview');
+    const btnExecute = document.getElementById('btn-execute-bulk');
+
+    if (!ipValue || !vlanValue) {
+        alert("Mohon masukkan IP dan VLAN VOIP tujuan.");
+        return;
+    }
+
+    // Filter data lokal untuk melihat berapa banyak port yang terdampak
+    const affectedPorts = data.filter(item => String(item.IP).trim() === ipValue);
+    
+    if (affectedPorts.length > 0) {
+        previewBox.innerHTML = `
+            <strong>Device Found!</strong><br>
+            IP: ${ipValue}<br>
+            Ditemukan <b>${affectedPorts.length}</b> baris/port yang akan diupdate ke VLAN <b>${vlanValue}</b>.
+        `;
+        previewBox.classList.remove('hidden');
+        btnExecute.disabled = false;
+    } else {
+        previewBox.innerHTML = `<span style="color:red">IP ${ipValue} tidak ditemukan di database.</span>`;
+        previewBox.classList.remove('hidden');
+        btnExecute.disabled = true;
+    }
+}
+
+async function executeBulkUpdate() {
+    const ip = document.getElementById('bulk-ip').value.trim();
+    const vlan = document.getElementById('bulk-vlan').value.trim();
+    const btn = document.getElementById('btn-execute-bulk');
+
+    if (!confirm(`Konfirmasi: Update SEMUA (${ip}) di Google Sheets ke VLAN VOIP ${vlan}?`)) return;
+
+    btn.innerText = "Writing to Sheets...";
+    btn.disabled = true;
+
+    try {
+        // Mengirim data ke Google Apps Script via POST
+        const response = await fetch(scriptUrl, {
+            method: "POST",
+            mode: "no-cors", // Penting untuk Apps Script
+            cache: "no-cache",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ ip: ip, vlan: vlan })
+        });
+
+        // Karena mode no-cors, kita tidak bisa baca body response, 
+        // tapi kita asumsikan sukses jika fetch tidak error
+        alert(`Request terkirim! Sistem sedang memperbarui Google Sheets. Silakan refresh data setelah beberapa saat.`);
+        
+        // Reset Form
+        document.getElementById('bulk-preview').classList.add('hidden');
+        document.getElementById('bulk-ip').value = "";
+        document.getElementById('bulk-vlan').value = "";
+        
+        // Refresh data lokal setelah 3 detik
+        setTimeout(() => init(), 3000);
+
+    } catch (error) {
+        logStatus("Gagal Update: " + error.message, true);
+        alert("Terjadi kesalahan saat menghubungi server.");
+    } finally {
+        btn.innerText = "Update All";
+        btn.disabled = false;
+    }
+}
 
 init();
