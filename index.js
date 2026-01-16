@@ -246,11 +246,40 @@ themeToggle.addEventListener('click', () => {
 
 
 // --- Fungsi Bulk Update VLAN VOIP ---
+function previewBulkUpdate() {
+    const ipValue = document.getElementById('bulk-ip').value.trim();
+    const vlanValue = document.getElementById('bulk-vlan').value.trim();
+    const previewBox = document.getElementById('bulk-preview');
+    const btnExecute = document.getElementById('btn-execute-bulk');
+
+    if (!ipValue || !vlanValue) {
+        alert("Mohon masukkan IP dan VLAN VOIP tujuan.");
+        return;
+    }
+
+    // Filter data lokal untuk melihat berapa banyak port yang terdampak
+    const affectedPorts = data.filter(item => String(item.IP).trim() === ipValue);
+    
+    if (affectedPorts.length > 0) {
+        previewBox.innerHTML = `
+            <strong>Device Found!</strong><br>
+            IP: ${ipValue}<br>
+            Ditemukan <b>${affectedPorts.length}</b> baris/port yang akan diupdate ke VLAN <b>${vlanValue}</b>.
+        `;
+        previewBox.classList.remove('hidden');
+        btnExecute.disabled = false;
+    } else {
+        previewBox.innerHTML = `<span style="color:red">IP ${ipValue} tidak ditemukan di database.</span>`;
+        previewBox.classList.remove('hidden');
+        btnExecute.disabled = true;
+    }
+}
+
 async function executeBulkUpdate() {
     const ip = document.getElementById('bulk-ip').value.trim();
     const vlan = document.getElementById('bulk-vlan').value.trim();
     const btn = document.getElementById('btn-execute-bulk');
-    const scriptUrl = "https://script.google.com/macros/s/AKfycby-acpTLqQbqdw_a9B34v0sl42H-Fvxxrqg139C56BnVMGNs5F1hDWhDAamPhIDXtZp/exec"; // PASTIKAN URL BENAR
+    const scriptUrl = "https://script.google.com/macros/s/AKfycby-acpTLqQbqdw_a9B34v0sl42H-Fvxxrqg139C56BnVMGNs5F1hDWhDAamPhIDXtZp/exec"; // PASTIKAN URL SUDAH BENAR
 
     if (!confirm(`Update SEMUA port di IP ${ip} ke VLAN ${vlan}?`)) return;
 
