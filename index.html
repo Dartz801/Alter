@@ -1,143 +1,54 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8" />
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Network Inventory & Alter Prov</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <title>Modern Data Processor</title>
+    <link rel="stylesheet" href="style.css">
     <script src="https://unpkg.com/lucide@latest"></script>
-    <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
-    <header class="top-nav">
-        <div class="nav-content">
-            <h1><i data-lucide="layers"></i> Provisioning <span>Bogor</span></h1>
-            <div style="display: flex; align-items: center; gap: 15px;">
-                <button id="theme-toggle" class="btn-theme" title="Ubah Tema">
-                    <i data-lucide="moon" id="theme-icon"></i>
-                </button>
-                <div class="status-badge">System Active</div>
-            </div>
-        </div>
+<div class="container">
+    <header>
+        <div class="logo-icon"><i data-lucide="database"></i></div>
+        <h1>Attribute Processor</h1>
+        <p>Ubah data vertikal menjadi tabel horizontal secara instan.</p>
     </header>
-
-    <div class="main-wrapper">
-<div class="side-panel">
-    <div class="card animate-up">
-        <div class="tab-navigation">
-            <button class="tab-btn active" onclick="openTab(event, 'search-tab')">
-                <i data-lucide="search"></i> Search
-            </button>
-            <button class="tab-btn" onclick="openTab(event, 'service-tab')">
-                <i data-lucide="terminal"></i> Service
-            </button>
-            <button class="tab-btn" onclick="openTab(event, 'bulk-tab')">
-                <i data-lucide="refresh-cw"></i> Bulk
-            </button>
-        </div>
-
-        <div id="search-tab" class="tab-content active">
-            <div class="card-header-sm">
-                <h2>Inventory Search</h2>
-            </div>
-            <div class="search-controls">
-                <input id="ip" type="text" placeholder="IP Address" />
-                <input id="slot" type="text" placeholder="Slot" />
-                <input id="port" type="text" placeholder="Port" />
-                <button id="search-btn" class="btn-primary-sm">Cari</button>
-            </div>
-            <div class="table-container mini-table">
-                <table id="result">
-                    <thead>
-                        <tr>
-                            <th>VLAN NET</th>
-                            <th>VLAN VOIP</th>
-                            <th>ID PORT</th>
-                            <th>GPON</th>
-                        </tr>
-                    </thead>
-                    <tbody id="result-body"></tbody>
-                </table>
+    
+    <div class="card">
+        <div class="input-section">
+            <label for="inputData">Tempel Data di Sini</label>
+            <textarea id="inputData" placeholder="Contoh:&#10;WO123&#10;Warna&#10;Merah&#10;WO123&#10;Ukuran&#10;XL"></textarea>
+            
+            <div class="button-group">
+                <button id="btnProcess" class="btn-primary">
+                    <i data-lucide="play" class="icon"></i> Proses Data
+                </button>
+                <button id="btnClear" class="btn-secondary">
+                    <i data-lucide="trash-2" class="icon"></i> Bersih
+                </button>
             </div>
         </div>
+    </div>
 
-        <div id="service-tab" class="tab-content">
-            <div class="card-header-sm">
-                <h2>Service Selector</h2>
-            </div>
-            <div class="extractor-mini">
-                <textarea id="inputText" placeholder="Paste Detail BIMA..." style="height: 150px;"></textarea>
-                <button id="btnExtract" class="btn-secondary-sm">Generate</button>
-            </div>
+    <div id="outputSection" class="output-section" style="display: none;">
+        <div class="table-header">
+            <h3><i data-lucide="layout-grid" class="icon"></i> Hasil Konversi</h3>
+            <button id="btnCopy" class="btn-outline">
+                <i data-lucide="copy" class="icon"></i> Salin ke Clipboard
+            </button>
         </div>
-
-        <div id="bulk-tab" class="tab-content">
-            <div class="card-header-sm">
-                <h2 style="color: #8b5cf6;">Update VLAN VOIP Massal</h2>
-            </div>
-            <div class="extractor-mini">
-                <input type="text" id="bulk-ip" placeholder="Masukkan IP Perangkat..." style="width: 100%; margin-bottom: 8px;">
-                <input type="number" id="bulk-vlan" placeholder="VLAN VOIP Baru (e.g. 200)" style="width: 100%; margin-bottom: 8px;">
-                <div id="bulk-preview" class="hidden preview-box" style="margin-bottom: 10px;"></div>
-                <div style="display: flex; gap: 5px;">
-                    <button onclick="previewBulkUpdate()" class="btn-secondary-sm" style="flex: 1;">Preview</button>
-                    <button id="btn-execute-bulk" onclick="executeBulkUpdate()" class="btn-primary-sm" style="flex: 1; background: #8b5cf6;" disabled>Update All</button>
-                </div>
-            </div>
+        <div class="table-wrapper">
+            <table id="resultTable">
+                <thead><tr id="tableHead"></tr></thead>
+                <tbody id="tableBody"></tbody>
+            </table>
         </div>
     </div>
 </div>
 
-        <div class="main-panel">
-            <section class="card animate-up" style="animation-delay: 0.1s;">
-                <div class="card-header-sm">
-                    <i data-lucide="settings-2" class="text-purple"></i>
-                    <h2>Alter Provisioning</h2>
-                </div>
-                
-                <div class="table-container">
-                    <table id="dataTable" class="input-table">
-                        <thead>
-                            <tr>
-                                <th>RESOURCE_ID</th>
-                                <th>SERVICE_NAME</th>
-                                <th>TARGET_ID</th>
-                                <th>CONFIG_ITEM_NAME</th>
-                                <th style="width: 40px;"></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td><input type="text" class="res-id" placeholder="ID"></td>
-                                <td><input type="text" class="ser-name" placeholder="Name"></td>
-                                <td><input type="text" class="tar-id" placeholder="Target"></td>
-                                <td>
-                                    <select class="cfg-name">
-                                        <option value="Service_Port">Service_Port</option>
-                                        <option value="S-Vlan">S-Vlan</option>
-                                        <option value="Subscriber_Terminal_Port">Sub_Port</option>
-                                        <option value="Service_Trail">Trail</option>
-                                    </select>
-                                </td>
-                                <td><button class="btn-remove" onclick="removeRow(this)">✕</button></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <div class="footer-actions-sm">
-                    <button class="btn-ghost-sm" onclick="addRow()"><i data-lucide="plus"></i>Add</button>
-                    <button class="btn-download-sm" onclick="downloadCSV()"><i data-lucide="download"></i>Export CSV</button>                    
-                    <button onclick="clearTable()" class="btn-clear"><i data-lucide="trash-2" style="width:16px; height:16px"></i> Clear</button>
-                </div>
-                <p id="empty-msg" class="empty-state"></p>
-            </section>
-        </div>
-    </div>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
-    <script src="index.js"></script>
-    <script>lucide.createIcons();</script>
+<script src="script.js"></script>
+<script>lucide.createIcons();</script>
 </body>
 </html>
