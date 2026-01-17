@@ -8,17 +8,22 @@ function logStatus(message, isError = false) {
 
 // 1. Inisialisasi Data
 function init() {
-    logStatus("Memulai pengambilan data...");
+    console.log("Memulai pengambilan data...");
     Papa.parse(sheetUrl, {
         download: true,
         header: true,
         skipEmptyLines: true,
         complete: function (results) {
             data = results.data;
-            logStatus("Data Berhasil Dimuat! Baris: " + data.length);
+            console.log("Data Berhasil Dimuat! Total baris:", data.length);
+            // Cek di console apakah kolom terdeteksi (IP, SLOT, PORT)
+            if (data.length > 0) {
+                console.log("Contoh Kolom:", Object.keys(data[0]));
+            }
         },
         error: function(error) {
-            logStatus("Gagal memuat CSV: " + error.message, true);
+            console.error("Gagal memuat CSV dari Google Sheets:", error);
+            alert("Gagal mengambil data dari Google Sheets. Pastikan spreadsheet sudah di-publish ke web sebagai CSV.");
         }
     });
 }
@@ -33,7 +38,13 @@ document.getElementById("search-btn").addEventListener("click", () => {
         alert("Mohon isi semua field: IP, Slot, dan Port");
         return;
     }
+    
+    if (data.length === 0) {
+        alert("Data belum siap atau gagal dimuat. Silakan refresh halaman.");
+        return;
+    }
 
+// Filter data - Pastikan Nama Kolom di Excel sama persis (Case Sensitive)
     const filteredData = data.filter((item) => {
         return (
             String(item.IP || "").trim() === inputIP && 
