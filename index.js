@@ -32,6 +32,12 @@ function init() {
 
 // 2. Fungsi Search & Auto-Fill (GABUNGAN)
 document.getElementById("search-btn").addEventListener("click", () => {
+    // Cek jika data belum dimuat
+    if (data.length === 0) {
+        alert("Data database belum siap atau gagal dimuat. Mohon tunggu/refresh.");
+        return;
+    }
+
     const inputIP = document.getElementById("ip").value.trim();
     const inputSlot = document.getElementById("slot").value.trim();
     const inputPort = document.getElementById("port").value.trim();
@@ -41,22 +47,23 @@ document.getElementById("search-btn").addEventListener("click", () => {
         return;
     }
 
+    // Filter dengan penanganan error kolom yang hilang
     const filteredData = data.filter((item) => {
-        return (
-            String(item.IP || "").trim() === inputIP && 
-            String(item.SLOT || "").trim() === inputSlot && 
-            String(item.PORT || "").trim() === inputPort
-        );
+        const valIP = String(item.IP || "").trim();
+        const valSlot = String(item.SLOT || "").trim();
+        const valPort = String(item.PORT || "").trim();
+
+        return valIP === inputIP && valSlot === inputSlot && valPort === inputPort;
     });
 
-    // Render Tabel Kecil (Inventory Search)
-    renderInventoryTable(filteredData);
-
-    // AUTO-FILL ke Alter Provisioning jika data ditemukan
     if (filteredData.length > 0) {
+        renderInventoryTable(filteredData);
         autoFillAlterProv(filteredData[0]);
+        logStatus("Data ditemukan untuk IP: " + inputIP);
     } else {
-        alert("Data tidak ditemukan di database.");
+        alert("Data tidak ditemukan di database. Pastikan IP/Slot/Port tepat.");
+        // Kosongkan tabel jika tidak ditemukan
+        document.getElementById("result-body").innerHTML = "<tr><td colspan='4'>Tidak ada data</td></tr>";
     }
 });
 
