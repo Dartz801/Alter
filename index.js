@@ -1,4 +1,4 @@
-const sheetUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR_LsggdPOwSms8SO0wuSEiMAIdyMjYlt0G9z71aZa2gy0ngATMJiakSa_a7cygOFa1WhCinsfHk3AQ/pub?gid=1252451747&single=true&output=csv";
+const sheetUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQmM58_LHgxH2bvHvgwHL6gAifeooASymk2Kh88ozV-ekzalPlCSUBYhMvlx-mvTuX1W3W9rolokmAE/pub?gid=0&single=true&output=csv";
 
 let data = [];
 
@@ -8,22 +8,17 @@ function logStatus(message, isError = false) {
 
 // 1. Inisialisasi Data
 function init() {
-    console.log("Memulai pengambilan data...");
+    logStatus("Memulai pengambilan data...");
     Papa.parse(sheetUrl, {
         download: true,
         header: true,
         skipEmptyLines: true,
         complete: function (results) {
             data = results.data;
-            console.log("Data Berhasil Dimuat! Total baris:", data.length);
-            // Cek di console apakah kolom terdeteksi (IP, SLOT, PORT)
-            if (data.length > 0) {
-                console.log("Contoh Kolom:", Object.keys(data[0]));
-            }
+            logStatus("Data Berhasil Dimuat! Baris: " + data.length);
         },
         error: function(error) {
-            console.error("Gagal memuat CSV dari Google Sheets:", error);
-            alert("Gagal mengambil data dari Google Sheets. Pastikan spreadsheet sudah di-publish ke web sebagai CSV.");
+            logStatus("Gagal memuat CSV: " + error.message, true);
         }
     });
 }
@@ -38,13 +33,7 @@ document.getElementById("search-btn").addEventListener("click", () => {
         alert("Mohon isi semua field: IP, Slot, dan Port");
         return;
     }
-    
-    if (data.length === 0) {
-        alert("Data belum siap atau gagal dimuat. Silakan refresh halaman.");
-        return;
-    }
 
-// Filter data - Pastikan Nama Kolom di Excel sama persis (Case Sensitive)
     const filteredData = data.filter((item) => {
         return (
             String(item.IP || "").trim() === inputIP && 
@@ -77,7 +66,7 @@ function renderInventoryTable(filteredData) {
         `;
         tbody.appendChild(row);
     });
-};
+}
 
 function autoFillAlterProv(item) {
     const tbody = document.querySelector("#dataTable tbody");
@@ -290,7 +279,7 @@ async function executeBulkUpdate() {
     const ip = document.getElementById('bulk-ip').value.trim();
     const vlan = document.getElementById('bulk-vlan').value.trim();
     const btn = document.getElementById('btn-execute-bulk');
-    const scriptUrl = "https://script.google.com/macros/s/AKfycbyA26BhO2x_IV3unJ2c1n9RjVL4hQoDOOPn1iMI4cN7lCX4zZRMkohexULqLfnmNPfRCw/exec"; // PASTIKAN URL SUDAH BENAR
+    const scriptUrl = "https://script.google.com/macros/s/AKfycby-acpTLqQbqdw_a9B34v0sl42H-Fvxxrqg139C56BnVMGNs5F1hDWhDAamPhIDXtZp/exec"; // PASTIKAN URL SUDAH BENAR
 
     if (!confirm(`Update SEMUA port di IP ${ip} ke VLAN ${vlan}?`)) return;
 
@@ -324,96 +313,5 @@ async function executeBulkUpdate() {
         btn.disabled = false;
     }
 }
-
-function openTab(evt, tabName) {
-    // Sembunyikan semua tab content
-    const tabContents = document.getElementsByClassName("tab-content");
-    for (let i = 0; i < tabContents.length; i++) {
-        tabContents[i].classList.remove("active");
-    }
-
-    // Nonaktifkan semua tombol tab
-    const tabButtons = document.getElementsByClassName("tab-btn");
-    for (let i = 0; i < tabButtons.length; i++) {
-        tabButtons[i].classList.remove("active");
-    }
-
-    // Tampilkan tab yang diklik
-    document.getElementById(tabName).classList.add("active");
-    evt.currentTarget.classList.add("active");
-    
-    // Refresh icon Lucide jika diperlukan
-    lucide.createIcons();
-}
-
-// --- Fungsi Attribute Processor (Vertikal ke Horizontal) ---
-
-document.getElementById('btnProcessAttr').addEventListener('click', function() {
-    const input = document.getElementById('inputAttr').value.trim();
-    if (!input) return alert("Data kosong!");
-
-    const lines = input.split(/\n/).map(line => line.trim()).filter(line => line !== "");
-    const dataMap = {};
-    const attributes = new Set();
-
-    // Logika: Membaca 3 baris sekaligus (ID, Key, Value)
-    for (let i = 0; i < lines.length; i += 3) {
-        const id = lines[i];
-        const key = lines[i + 1];
-        const value = lines[i + 2];
-
-        if (id && key && value) {
-            if (!dataMap[id]) dataMap[id] = { "ID": id };
-            dataMap[id][key] = value;
-            attributes.add(key);
-        }
-    }
-
-    renderAttrTable(dataMap, Array.from(attributes));
-});
-
-function renderAttrTable(dataMap, attrList) {
-    const head = document.getElementById('attrHead');
-    const body = document.getElementById('attrBody');
-    const outputArea = document.getElementById('attrOutputArea');
-
-    // Header: Tanpa kolom ID
-    let headHTML = `<tr>`;
-    attrList.forEach(attr => headHTML += `<th>${attr}</th>`);
-    headHTML += `</tr>`;
-    head.innerHTML = headHTML;
-
-    // Body: Tanpa kolom ID
-    let bodyHTML = "";
-    Object.values(dataMap).forEach(row => {
-        bodyHTML += `<tr>`;
-        attrList.forEach(attr => {
-            bodyHTML += `<td>${row[attr] || '-'}</td>`;
-        });
-        bodyHTML += `</tr>`;
-    });
-    body.innerHTML = bodyHTML;
-    
-    outputArea.classList.remove('hidden');
-    lucide.createIcons();
-}
-
-// Fungsi Copy Table ke Clipboard (Agar bisa langsung paste ke Excel)
-document.getElementById('btnCopyAttr').addEventListener('click', function() {
-    const table = document.getElementById('attrResultTable');
-    const range = document.createRange();
-    range.selectNode(table);
-    window.getSelection().removeAllRanges();
-    window.getSelection().addRange(range);
-    document.execCommand('copy');
-    window.getSelection().removeAllRanges();
-    alert("Tabel berhasil disalin!");
-});
-
-document.getElementById('btnClearAttr').addEventListener('click', () => {
-    document.getElementById('inputAttr').value = "";
-    document.getElementById('attrOutputArea').classList.add('hidden');
-});
-
 
 init();
