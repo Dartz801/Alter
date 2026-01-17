@@ -1,4 +1,4 @@
-const sheetUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQmM58_LHgxH2bvHvgwHL6gAifeooASymk2Kh88ozV-ekzalPlCSUBYhMvlx-mvTuX1W3W9rolokmAE/pub?gid=0&single=true&output=csv";
+const sheetUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR_LsggdPOwSms8SO0wuSEiMAIdyMjYlt0G9z71aZa2gy0ngATMJiakSa_a7cygOFa1WhCinsfHk3AQ/pub?gid=1252451747&single=true&output=csv";
 
 let data = [];
 
@@ -290,7 +290,7 @@ async function executeBulkUpdate() {
     const ip = document.getElementById('bulk-ip').value.trim();
     const vlan = document.getElementById('bulk-vlan').value.trim();
     const btn = document.getElementById('btn-execute-bulk');
-    const scriptUrl = "https://script.google.com/macros/s/AKfycby-acpTLqQbqdw_a9B34v0sl42H-Fvxxrqg139C56BnVMGNs5F1hDWhDAamPhIDXtZp/exec"; // PASTIKAN URL SUDAH BENAR
+    const scriptUrl = "https://script.google.com/macros/s/AKfycbyA26BhO2x_IV3unJ2c1n9RjVL4hQoDOOPn1iMI4cN7lCX4zZRMkohexULqLfnmNPfRCw/exec"; // PASTIKAN URL SUDAH BENAR
 
     if (!confirm(`Update SEMUA port di IP ${ip} ke VLAN ${vlan}?`)) return;
 
@@ -414,5 +414,6 @@ document.getElementById('btnClearAttr').addEventListener('click', () => {
     document.getElementById('inputAttr').value = "";
     document.getElementById('attrOutputArea').classList.add('hidden');
 });
+
 
 init();
