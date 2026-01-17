@@ -23,66 +23,74 @@
     </header>
 
     <div class="main-wrapper">
-        <div class="side-panel">
-            <section class="card animate-up">
-                <div class="card-header-sm">
-                    <i data-lucide="search" class="text-primary"></i>
-                    <h2>Inventory Search</h2>
-                </div>
-                <div class="search-controls">
-                    <input id="ip" type="text" placeholder="IP Address" />
-                    <input id="slot" type="text" placeholder="Slot" />
-                    <input id="port" type="text" placeholder="Port" />
-                    <button id="search-btn" class="btn-primary-sm">Cari</button>
-                </div>
-                <div class="table-container mini-table">
-                    <table id="result">
-                        <thead>
-                            <tr>
-                                <th>VLAN NET</th>
-                                <th>VLAN VOIP</th>
-                                <th>ID PORT</th>
-                                <th>GPON</th>
-                            </tr>
-                        </thead>
-                        <tbody id="result-body"></tbody>
-                    </table>
-                </div>
-            </section>
-
-            <section class="card animate-up" style="animation-delay: 0.1s; border-left: 4px solid #8b5cf6;">
-                <div class="card-header-sm">
-                    <i data-lucide="refresh-cw" class="text-purple"></i>
-                    <h2>Update VLAN VOIP Massal</h2>
-                </div>
-                <div class="extractor-mini">
-                    <input type="text" id="bulk-ip" placeholder="Masukkan IP Perangkat..." style="width: 100%; margin-bottom: 8px; padding: 10px; border-radius: 6px; border: 1px solid #ddd;">
-                    <input type="number" id="bulk-vlan" placeholder="VLAN VOIP Baru (e.g. 200)" style="width: 100%; margin-bottom: 8px; padding: 10px; border-radius: 6px; border: 1px solid #ddd;">
-                    
-                    <div id="bulk-preview" class="hidden" style="background: #f1f5f9; padding: 8px; border-radius: 5px; font-size: 11px; margin-bottom: 8px; max-height: 80px; overflow-y: auto;">
-                        </div>
-
-                    <div style="display: flex; gap: 5px;">
-                        <button onclick="previewBulkUpdate()" class="btn-secondary-sm" style="flex: 1;">Preview</button>
-                        <button id="btn-execute-bulk" onclick="executeBulkUpdate()" class="btn-primary-sm" style="flex: 1; background: #8b5cf6;" disabled>Update All</button>
-                    </div>
-                </div>
-            </section>
-
-            <section class="card animate-up" style="animation-delay: 0.2s;">
-                <div class="card-header-sm">
-                    <i data-lucide="terminal" class="text-green"></i>
-                    <h2>Service Selector</h2>
-                </div>
-                <div class="extractor-mini">
-                    <textarea id="inputText" placeholder="Paste Detail BIMA..."></textarea>
-                    <button id="btnExtract" class="btn-secondary-sm">Generate</button>
-                </div>
-                <div id="resultArea" class="result-area hidden">
-                    <div id="outputList" class="compact-output"></div>
-                </div>
-            </section>
+<div class="side-panel">
+    <div class="card animate-up">
+        <div class="tab-navigation">
+            <button class="tab-btn active" onclick="openTab(event, 'search-tab')">
+                <i data-lucide="search"></i> Search
+            </button>
+            <button class="tab-btn" onclick="openTab(event, 'service-tab')">
+                <i data-lucide="terminal"></i> Service
+            </button>
+            <button class="tab-btn" onclick="openTab(event, 'bulk-tab')">
+                <i data-lucide="refresh-cw"></i> Bulk Update
+            </button>
         </div>
+
+        <div id="search-tab" class="tab-content active">
+            <div class="card-header-sm">
+                <h2>Inventory Search</h2>
+            </div>
+            <div class="search-controls">
+                <input id="ip" type="text" placeholder="IP Address" />
+                <input id="slot" type="text" placeholder="Slot" />
+                <input id="port" type="text" placeholder="Port" />
+                <button id="search-btn" class="btn-primary-sm">Cari</button>
+            </div>
+            <div class="table-container mini-table">
+                <table id="result">
+                    <thead>
+                        <tr>
+                            <th>VLAN NET</th>
+                            <th>VLAN VOIP</th>
+                            <th>ID PORT</th>
+                            <th>GPON</th>
+                        </tr>
+                    </thead>
+                    <tbody id="result-body"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="bulk-tab" class="tab-content">
+            <div class="card-header-sm">
+                <h2>Update VLAN VOIP Massal</h2>
+            </div>
+            <div class="extractor-mini">
+                <input type="text" id="bulk-ip" placeholder="Masukkan IP Perangkat...">
+                <input type="number" id="bulk-vlan" placeholder="VLAN VOIP Baru (e.g. 200)">
+                <div id="bulk-preview" class="hidden preview-box"></div>
+                <div style="display: flex; gap: 5px; margin-top: 10px;">
+                    <button onclick="previewBulkUpdate()" class="btn-secondary-sm" style="flex: 1;">Preview</button>
+                    <button id="btn-execute-bulk" onclick="executeBulkUpdate()" class="btn-primary-sm" style="flex: 1; background: #8b5cf6;" disabled>Update All</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="service-tab" class="tab-content">
+            <div class="card-header-sm">
+                <h2>Service Selector</h2>
+            </div>
+            <div class="extractor-mini">
+                <textarea id="inputText" placeholder="Paste Detail BIMA..." style="height: 120px;"></textarea>
+                <button id="btnExtract" class="btn-secondary-sm">Generate</button>
+            </div>
+        </div>
+
+
+
+    </div>
+</div>
 
         <div class="main-panel">
             <section class="card animate-up" style="animation-delay: 0.3s;">
