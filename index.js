@@ -14,8 +14,15 @@ function init() {
         header: true,
         skipEmptyLines: true,
         complete: function (results) {
-            data = results.data;
-            logStatus("Data Berhasil Dimuat! Baris: " + data.length);
+            // Validasi apakah data benar-to-benar ada
+            if (results.data && results.data.length > 0) {
+                data = results.data;
+                logStatus("Data Berhasil Dimuat! Total: " + data.length + " baris.");
+                // Aktifkan tombol search setelah data siap
+                document.getElementById("search-btn").disabled = false; 
+            } else {
+                logStatus("Data kosong atau format salah.", true);
+            }
         },
         error: function(error) {
             logStatus("Gagal memuat CSV: " + error.message, true);
